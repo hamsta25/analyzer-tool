@@ -44,6 +44,71 @@ pip install -r requirements.txt
 
 After installing Tesseract on Windows, add it to your `PATH` (e.g. `C:\Program Files\Tesseract-OCR`).
 
+---
+
+## Verifying and configuring PATH
+
+After installing **ffmpeg** or **Tesseract**, ensure they're in your system PATH so the tools can find them.
+
+### Verify installation
+
+```bash
+# Verify ffmpeg
+ffmpeg -version
+
+# Verify Tesseract
+tesseract --version
+```
+
+If either command returns "not found," add them to PATH:
+
+### Windows (PowerShell / Command Prompt)
+
+**ffmpeg** — common installation paths:
+- `C:\Program Files\ffmpeg\bin` (if installed via installer)
+- `C:\tools\ffmpeg\bin` (if used Chocolatey without admin)
+
+To add to PATH persistently:
+1. Press `Win+X` → Select "System"
+2. Click "Advanced system settings" → "Environment Variables"
+3. Under "User variables" or "System variables," select `Path` → **Edit**
+4. Click **New** and paste the ffmpeg install path
+5. Click **OK** and restart your terminal
+6. Verify: `ffmpeg -version`
+
+**Tesseract** — typical path: `C:\Program Files\Tesseract-OCR`
+
+Add temporarily (current PowerShell session):
+```powershell
+$env:PATH += ";C:\Program Files\Tesseract-OCR"
+tesseract --version
+```
+
+Add persistently (as Administrator in PowerShell):
+```powershell
+[Environment]::SetEnvironmentVariable("PATH", $env:PATH + ";C:\Program Files\Tesseract-OCR", "User")
+# Restart PowerShell to apply
+```
+
+### macOS / Linux
+
+If `brew install` or `apt install` was used, both tools should already be in PATH. Verify:
+```bash
+which ffmpeg && which tesseract
+```
+
+If not found despite installation:
+```bash
+# Find installation path
+find /usr/local/bin -name ffmpeg -o -name tesseract
+
+# Add to shell profile (~/.zshrc, ~/.bashrc, or ~/.bash_profile)
+export PATH="/usr/local/bin:$PATH"
+source ~/.zshrc  # reload
+```
+
+---
+
 ### Automated setup
 
 ```powershell
@@ -53,6 +118,48 @@ After installing Tesseract on Windows, add it to your `PATH` (e.g. `C:\Program F
 # Linux/macOS
 bash setup.sh
 ```
+
+---
+
+## Troubleshooting
+
+### "Python not found" or "pip not found"
+
+Windows users with MSYS2, Git Bash, or Cygwin installed may encounter conflicts if those tools are in PATH before Python.org Python.
+
+#### Diagnose the issue
+
+```powershell
+# Check which Python is resolved first
+where python
+py -0p  # Shows all Python installations and active one
+```
+
+⚠️ **If you see `C:\msys64\ucrt64\bin\python.exe` or `C:\...\Git\usr\bin\python.exe` (MSYS2 or Git Bash Python)**:
+- This Python lacks pip and doesn't have installed packages
+- Even after installing via `py -3 -m pip install`, bare `python` won't find them
+- The solution is **Preferred (below) or adjust PATH order**
+
+If you see bare `python` resolve to MSYS2 but want to keep it as default:
+
+#### Solutions
+
+**Preferred (Windows Python launcher)**:
+```powershell
+py -3 -m pip install -r requirements.txt
+python src/analyzer.py --help
+```
+
+**Alternative (ensure Python.org Python is first in PATH)**:
+1. Install Python from https://www.python.org/downloads/
+2. Open "Environment Variables" (`Win+X` → System → Advanced → Environment Variables)
+3. Move the Python.org path (e.g., `C:\Users\...\AppData\Local\Programs\Python\Python314`) **before** any MSYS2/Git Bash paths
+4. Restart PowerShell and re-run `.\setup.ps1`
+
+**If still stuck**:
+- Run `.\setup.ps1` which validates pip availability and prints diagnostics
+- Review the error message for additional guidance
+- On Linux/macOS, check: `which -a python3 python` and `python3 -m pip --version`
 
 ---
 
