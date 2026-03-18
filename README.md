@@ -236,3 +236,55 @@ analyzer-tool/
 ```
 
 > **Note:** The `out/` folder is gitignored. Copy or symlink it per course/project as needed.
+
+
+---
+
+## Tesseract & FFmpeg Quick-Install (Troubleshooting)
+
+### Tesseract OCR
+
+Tesseract must be installed separately  it is **not** a Python package:
+
+```powershell
+# Windows
+winget install UB-Mannheim.TesseractOCR
+```
+
+```bash
+# Ubuntu/Debian
+sudo apt install tesseract-ocr
+
+# macOS
+brew install tesseract
+```
+
+> **Note:** `pytesseract` is **not used** in this tool. Tesseract is called directly via
+> `subprocess` to avoid ABI incompatibilities between `pandas` (a `pytesseract` dependency)
+> and NumPy 2.x. No `pip install pytesseract` is needed.
+
+### FFmpeg
+
+FFmpeg must be installed separately:
+
+```powershell
+# Windows
+winget install Gyan.FFmpeg
+```
+
+```bash
+# Ubuntu/Debian
+sudo apt install ffmpeg
+
+# macOS
+brew install ffmpeg
+```
+
+The tool automatically searches common WinGet/Chocolatey install paths if `ffmpeg` is not on
+your system `PATH`.
+
+### Whisper model downloads
+
+Whisper models are downloaded automatically on first use from OpenAI's servers (~75 MB for
+`tiny`, up to ~3 GB for `large`). They are cached at `~/.cache/whisper/`. An internet
+connection is required only on the first run for each model size.

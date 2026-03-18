@@ -51,7 +51,7 @@ def main() -> None:
         slug = re.sub(r"[^\w]+", "_", args.query)[:50]
         out_file = out_dir / f"search_{slug}.md"
         out_file.write_text(markdown, encoding="utf-8")
-        print(f"→ {out_file}")
+        print(f"->→ {out_file}")
     else:
         print(markdown)
 

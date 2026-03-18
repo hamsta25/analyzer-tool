@@ -1,2 +1,7 @@
 # Created by venv; see https://docs.python.org/3/library/venv.html
 *
+
+# example-usage generated assets (run generate_examples.py to create them)
+example-usage/test-image.png
+example-usage/test-video.mp4
+example-usage/out/

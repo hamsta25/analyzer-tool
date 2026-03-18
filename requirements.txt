@@ -1,5 +1,6 @@
 PyMuPDF>=1.24
 openai-whisper
-pytesseract
+pdf2image
+Pillow
+requests
 duckduckgo-search
-pillow

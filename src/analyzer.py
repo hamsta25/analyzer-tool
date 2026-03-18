@@ -41,7 +41,7 @@ def cmd_search(args: argparse.Namespace) -> None:
         slug = re.sub(r"[^\w]+", "_", args.query)[:50]
         out_file = out_dir / f"search_{slug}.md"
         out_file.write_text(markdown, encoding="utf-8")
-        print(f"→ {out_file}")
+        print(f"->→ {out_file}")
     else:
         print(markdown)
 
@@ -59,14 +59,14 @@ def cmd_all(args: argparse.Namespace) -> None:
     # PDFs
     pdfs = list(base.rglob("*.pdf"))
     for pdf in pdfs:
-        print(f"[PDF] {pdf}")
+        print(f"->[PDF] {pdf}")
         process_path(pdf, out_dir, ocr_all=False)
         processed.append(f"- PDF: `{pdf.name}` → `{pdf.stem}.md`")
 
     # Videos
     videos = [f for f in base.rglob("*") if f.suffix.lower() in VIDEO_EXTENSIONS]
     for vid in videos:
-        print(f"[VIDEO] {vid}")
+        print(f"->[VIDEO] {vid}")
         transcribe(vid, args.model, out_dir)
         processed.append(f"- Video: `{vid.name}` → `{vid.stem}_transcript.md`")
 
@@ -79,7 +79,7 @@ def cmd_all(args: argparse.Namespace) -> None:
 
     index_file = out_dir / "index.md"
     index_file.write_text("\n".join(index_lines), encoding="utf-8")
-    print(f"\n→ Index written to {index_file}")
+    print(f"->\n→ Index written to {index_file}")
 
 
 def main() -> None:
