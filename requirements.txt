@@ -1,0 +1,5 @@
+PyMuPDF>=1.24
+openai-whisper
+pytesseract
+duckduckgo-search
+pillow
