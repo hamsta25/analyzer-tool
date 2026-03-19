@@ -50,6 +50,14 @@ On Windows, if you use a virtual environment, prefer:
 
 After installing Tesseract on Windows, add it to your `PATH` (e.g. `C:\Program Files\Tesseract-OCR`).
 
+#### OCRmyPDF (optional, improves scanned note preprocessing)
+
+| Platform | Command |
+|---|---|
+| Windows | `py -3 -m pip install ocrmypdf` |
+| Ubuntu/Debian | `sudo apt install ocrmypdf` |
+| macOS | `brew install ocrmypdf` |
+
 ---
 
 ## Verifying and configuring PATH
@@ -181,7 +189,7 @@ source .venv/Scripts/activate
 
 **If still stuck**:
 - Run `.\setup.ps1` which validates pip availability and prints diagnostics
-- Run `\.\scripts\env-doctor.ps1` to detect python/pip mismatch and venv issues in your current shell
+- Run `.\scripts\env-doctor.ps1` to detect python/pip mismatch and venv issues in your current shell
 - Review the error message for additional guidance
 - On Linux/macOS, check: `which -a python3 python` and `python3 -m pip --version`
 
@@ -197,6 +205,12 @@ python src/analyzer.py pdf path/to/file.pdf
 
 # Force OCR on all pages (e.g. fully handwritten notebook)
 python src/analyzer.py pdf path/to/file.pdf --ocr-all
+
+# Handwritten notes in Italian/English with better structure handling
+python src/analyzer.py pdf path/to/file.pdf --ocr-all --ocr-engine auto --ocr-lang ita+eng --tesseract-psm 6
+
+# Force OCRmyPDF preprocessing if installed (better for skew/noise/rotation)
+python src/analyzer.py pdf path/to/file.pdf --ocr-engine ocrmypdf --ocr-lang ita+eng
 
 # Process an entire directory of PDFs
 python src/analyzer.py pdf path/to/dir/
@@ -227,6 +241,14 @@ python src/video_transcriber.py path/to/video.mkv [--model base] [--output out/]
 # Web search (prints to stdout by default)
 python src/web_search.py "search query" [--n 5] [--output out/]
 ```
+
+### OCR strategy notes (handwritten/scanned pages)
+
+- `--ocr-engine auto` (recommended): tries OCRmyPDF preprocessing when available, then applies Tesseract OCR on sparse pages.
+- `--ocr-engine tesseract`: direct OCR only, faster setup but weaker on skew/noisy scans.
+- `--ocr-engine ocrmypdf`: forces OCRmyPDF preprocessing first (best for scanned lecture notes), then extraction.
+
+For pages with drawings/diagrams, the tool now exports page snapshots under `out/assets/<pdf-name>/` and embeds them in markdown so context is not lost when plain text OCR misses structure.
 
 ---
 

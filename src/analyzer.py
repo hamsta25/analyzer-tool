@@ -20,7 +20,14 @@ VIDEO_EXTENSIONS = {".mp4", ".mkv", ".avi", ".mov", ".webm", ".m4a", ".mp3", ".w
 
 def cmd_pdf(args: argparse.Namespace) -> None:
     from pdf_analyzer import process_path
-    process_path(Path(args.input), Path(args.output), args.ocr_all)
+    process_path(
+        Path(args.input),
+        Path(args.output),
+        args.ocr_all,
+        ocr_engine=args.ocr_engine,
+        ocr_lang=args.ocr_lang,
+        tesseract_psm=args.tesseract_psm,
+    )
 
 
 def cmd_video(args: argparse.Namespace) -> None:
@@ -60,7 +67,14 @@ def cmd_all(args: argparse.Namespace) -> None:
     pdfs = list(base.rglob("*.pdf"))
     for pdf in pdfs:
         print(f"->[PDF] {pdf}")
-        process_path(pdf, out_dir, ocr_all=False)
+        process_path(
+            pdf,
+            out_dir,
+            ocr_all=False,
+            ocr_engine="auto",
+            ocr_lang="eng",
+            tesseract_psm=6,
+        )
         processed.append(f"- PDF: `{pdf.name}` → `{pdf.stem}.md`")
 
     # Videos
@@ -92,6 +106,23 @@ def main() -> None:
     p_pdf = sub.add_parser("pdf", help="Extract text from a PDF file or directory")
     p_pdf.add_argument("input", help="PDF file or directory")
     p_pdf.add_argument("--ocr-all", action="store_true", help="Force OCR on all pages")
+    p_pdf.add_argument(
+        "--ocr-engine",
+        choices=["auto", "tesseract", "ocrmypdf"],
+        default="auto",
+        help="OCR engine strategy (default: auto)",
+    )
+    p_pdf.add_argument(
+        "--ocr-lang",
+        default="eng",
+        help="Tesseract language(s), e.g. eng or ita+eng",
+    )
+    p_pdf.add_argument(
+        "--tesseract-psm",
+        type=int,
+        default=6,
+        help="Tesseract page segmentation mode (default: 6)",
+    )
     p_pdf.add_argument("--output", default="out", help="Output directory (default: out/)")
 
     # video

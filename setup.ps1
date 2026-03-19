@@ -4,7 +4,23 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+Push-Location $PSScriptRoot
+try {
+
 Write-Host "=== analyzer-tool setup ===" -ForegroundColor Cyan
+
+# 0. Environment preflight
+Write-Host "`n[0/4] Running environment preflight..." -ForegroundColor Yellow
+$doctorScript = Join-Path $PSScriptRoot "scripts\env-doctor.ps1"
+if (Test-Path $doctorScript) {
+    & $doctorScript
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "  [Warn] Environment doctor reported issues. Setup will continue with safe interpreter resolution." -ForegroundColor Yellow
+    }
+}
+else {
+    Write-Host "  [Skip] scripts/env-doctor.ps1 not found." -ForegroundColor Yellow
+}
 
 # 1. Robust Python interpreter resolution
 Write-Host "`n[1/4] Resolving Python interpreter..." -ForegroundColor Yellow
@@ -19,7 +35,7 @@ foreach ($candidate in $candidates) {
         
         # Reject MSYS2/MinGW python if pip missing
         if ($candidate -eq "python.exe" -or $candidate -eq "python3.exe") {
-            $hasPip = & $fullPath -m pip --version 2>$null
+            & $fullPath -m pip --version 2>$null
             if ($LASTEXITCODE -ne 0) {
                 Write-Host "  [Skip] $candidate at $fullPath (pip not found)" -ForegroundColor Yellow
                 continue
@@ -104,3 +120,8 @@ if (Get-Command tesseract -ErrorAction SilentlyContinue) {
 
 Write-Host "`n=== Setup complete ===" -ForegroundColor Cyan
 Write-Host "Try: & '$Python' src/analyzer.py --help"
+
+}
+finally {
+    Pop-Location
+}
