@@ -32,7 +32,9 @@ def generate_image() -> None:
         img.save(out)
         print(f"[OK] Generated {out}")
     except ImportError:
-        sys.exit("Pillow is required to generate the test image. Run: pip install Pillow")
+        sys.exit(
+            "Pillow is required to generate the test image. Run: python -m pip install Pillow"
+        )
 
 
 def generate_video() -> None:

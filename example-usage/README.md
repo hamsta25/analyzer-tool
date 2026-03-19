@@ -7,7 +7,13 @@ This folder contains example scripts and assets to verify the analyzer-tool is w
 Make sure you have run from the repo root:
 
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
+```
+
+Windows venv-safe variant:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
 And installed the external tools:

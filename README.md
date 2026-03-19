@@ -20,7 +20,13 @@ All output goes to `out/` which is gitignored — manage it per-project or per-c
 ## Installation
 
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
+```
+
+On Windows, if you use a virtual environment, prefer:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
 ### External dependencies
@@ -147,7 +153,24 @@ If you see bare `python` resolve to MSYS2 but want to keep it as default:
 **Preferred (Windows Python launcher)**:
 ```powershell
 py -3 -m pip install -r requirements.txt
-python src/analyzer.py --help
+py -3 src/analyzer.py --help
+```
+
+**If you're inside a venv, always use interpreter-scoped pip**:
+```powershell
+python -m pip install -r requirements.txt
+```
+
+**Activation quick reference**:
+```powershell
+# PowerShell
+.\.venv\Scripts\Activate.ps1
+
+# CMD
+.\.venv\Scripts\activate.bat
+
+# Git Bash
+source .venv/Scripts/activate
 ```
 
 **Alternative (ensure Python.org Python is first in PATH)**:
@@ -158,6 +181,7 @@ python src/analyzer.py --help
 
 **If still stuck**:
 - Run `.\setup.ps1` which validates pip availability and prints diagnostics
+- Run `\.\scripts\env-doctor.ps1` to detect python/pip mismatch and venv issues in your current shell
 - Review the error message for additional guidance
 - On Linux/macOS, check: `which -a python3 python` and `python3 -m pip --version`
 
