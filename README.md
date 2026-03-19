@@ -91,11 +91,6 @@ To add to PATH persistently:
 6. Verify: `ffmpeg -version`
 
 **Tesseract** — typical path: `C:\Program Files\Tesseract-OCR`
-
-Add temporarily (current PowerShell session):
-```powershell
-$env:PATH += ";C:\Program Files\Tesseract-OCR"
-tesseract --version
 ```
 
 Add persistently (as Administrator in PowerShell):
@@ -114,7 +109,6 @@ which ffmpeg && which tesseract
 If not found despite installation:
 ```bash
 # Find installation path
-find /usr/local/bin -name ffmpeg -o -name tesseract
 
 # Add to shell profile (~/.zshrc, ~/.bashrc, or ~/.bash_profile)
 export PATH="/usr/local/bin:$PATH"
@@ -171,7 +165,6 @@ python -m pip install -r requirements.txt
 
 **Activation quick reference**:
 ```powershell
-# PowerShell
 .\.venv\Scripts\Activate.ps1
 
 # CMD
@@ -190,8 +183,25 @@ source .venv/Scripts/activate
 **If still stuck**:
 - Run `.\setup.ps1` which validates pip availability and prints diagnostics
 - Run `.\scripts\env-doctor.ps1` to detect python/pip mismatch and venv issues in your current shell
+- Run `.\scripts\python-env-remediate.ps1` for a safe PATH reordering dry-run (use `-Apply` to commit)
 - Review the error message for additional guidance
 - On Linux/macOS, check: `which -a python3 python` and `python3 -m pip --version`
+
+**Recommended Windows recovery sequence**:
+```powershell
+# 1) Diagnose
+.\scripts\env-doctor.ps1
+
+# 2) Simulate remediation
+.\scripts\python-env-remediate.ps1
+
+# 3) Apply remediation only if plan is correct
+.\scripts\python-env-remediate.ps1 -Apply
+# 4) Open a new terminal and verify
+where python
+py -0p
+python -m pip --version
+```
 
 ---
 
