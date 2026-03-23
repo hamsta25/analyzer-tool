@@ -18,17 +18,17 @@ HERE = Path(__file__).parent
 
 
 def generate_image() -> None:
-    out = HERE / "test-image.png"
+    out = HERE / "test-image-2.png"
     try:
         from PIL import Image, ImageDraw, ImageFont
 
-        img = Image.new("RGB", (400, 100), color=(255, 255, 255))
+        img = Image.new("RGB", (4000, 1000), color=(255, 255, 255))
         draw = ImageDraw.Draw(img)
         try:
             font = ImageFont.truetype("arial.ttf", 36)
         except Exception:
             font = ImageFont.load_default()
-        draw.text((20, 25), "Hello OCR test 123", fill=(0, 0, 0), font=font)
+        draw.text((20, 25), "Hello OCR test 123 /n i am trying my best /n adios", fill=(0, 0, 0), font=font)
         img.save(out)
         print(f"[OK] Generated {out}")
     except ImportError:
@@ -38,7 +38,7 @@ def generate_image() -> None:
 
 
 def generate_video() -> None:
-    out = HERE / "test-video.mp4"
+    out = HERE / "test-video-2.mp4"
     ffmpeg = shutil.which("ffmpeg")
     if ffmpeg is None:
         # Try known WinGet/Chocolatey paths
@@ -58,7 +58,7 @@ def generate_video() -> None:
         ffmpeg, "-y",
         "-f", "lavfi", "-i", "color=c=blue:size=320x240:rate=1",
         "-f", "lavfi", "-i", "anullsrc",
-        "-t", "5",
+        "-t", "9",
         "-c:v", "libx264",
         "-c:a", "aac",
         str(out),
