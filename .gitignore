@@ -5,3 +5,5 @@
 example-usage/test-image.png
 example-usage/test-video.mp4
 example-usage/out/
+test
+out/*
