@@ -30,6 +30,18 @@ Format: [Semantic Versioning](https://semver.org/) — `MAJOR.MINOR.PATCH`.
 - `tests/test_web_url_integration.py` now uses `ANALYZER_TEST_VIDEO_URL` (default short public sample URL) to avoid hardcoding long/private links
 - `requirements.txt` now pins `requests>=2.33.0` following local `pip-audit` vulnerability findings
 
+### Added — M7 Intelligent Summary (2026-04-02)
+
+- **`src/summarizer.py`** — new quality-checked summarization pipeline:
+  - Supports `.md`, `.txt`, `.pdf`, media files, and URL inputs
+  - Runs pre-summary checks for spelling, logical quality, and claim extraction
+  - Performs optional web-backed fact-check hints via DuckDuckGo search
+  - Produces `*_summary.md` reports with quality metrics and references
+- **`src/analyzer.py`** — new `summarize` subcommand in unified CLI
+- **`tests/test_summarizer.py`** — unit tests for summary extraction and quality checks
+- **`tests/test_summarize_cli.py`** — CLI regression test for summarize command
+- **`requirements.txt`** — added `pyspellchecker>=0.8.1` for spelling validation
+
 ---
 
 ## [0.1.0] — 2026-03-19

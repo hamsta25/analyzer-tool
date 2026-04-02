@@ -4,6 +4,7 @@ analyzer.py — Unified CLI entry point for the analyzer-tool.
 Usage:
     python src/analyzer.py pdf   path/to/file.pdf [--ocr-all] [--output out/]
     python src/analyzer.py video path/to/video.mkv [--model base] [--output out/]
+    python src/analyzer.py summarize input-file-or-url [--output out/] [--max-sentences 8]
     python src/analyzer.py search "query" [--n 5] [--output out/]
     python src/analyzer.py all   path/to/dir/ [--model base] [--output out/]
 
@@ -74,6 +75,25 @@ def cmd_search(args: argparse.Namespace) -> None:
         print(markdown)
 
 
+def cmd_summarize(args: argparse.Namespace) -> None:
+    from summarizer import summarize_input
+
+    out_file = summarize_input(
+        input_value=args.input,
+        output_dir=Path(args.output),
+        max_sentences=args.max_sentences,
+        model=args.model,
+        ocr_all=args.ocr_all,
+        ocr_engine=args.ocr_engine,
+        ocr_lang=args.ocr_lang,
+        tesseract_psm=args.tesseract_psm,
+        fact_check=not args.no_fact_check,
+        fact_check_results=args.fact_check_results,
+        max_claims=args.max_claims,
+    )
+    print(f"-> Summary: {out_file}")
+
+
 def cmd_all(args: argparse.Namespace) -> None:
     from pdf_analyzer import process_path
     from video_transcriber import transcribe
@@ -119,7 +139,7 @@ def cmd_all(args: argparse.Namespace) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Analyzer-tool: PDF extraction, video transcription, web search."
+        description="Analyzer-tool: PDF extraction, video transcription, web search, summarization."
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -159,6 +179,25 @@ def main() -> None:
     p_srch.add_argument("--n", type=int, default=5, help="Number of results (default: 5)")
     p_srch.add_argument("--output", default=None, help="Output directory (stdout if omitted)")
 
+    # summarize
+    p_sum = sub.add_parser("summarize", help="Create quality-checked summary from file or URL")
+    p_sum.add_argument("input", help="Source file or URL")
+    p_sum.add_argument("--output", default="out", help="Output directory (default: out/)")
+    p_sum.add_argument("--max-sentences", type=int, default=8, help="Summary sentence budget")
+    p_sum.add_argument("--model", default="base", choices=["tiny", "base", "small", "medium", "large"])
+    p_sum.add_argument("--ocr-all", action="store_true", help="Force OCR when summarize input is PDF")
+    p_sum.add_argument(
+        "--ocr-engine",
+        choices=["auto", "tesseract", "ocrmypdf"],
+        default="auto",
+        help="OCR engine strategy for PDF input",
+    )
+    p_sum.add_argument("--ocr-lang", default="eng", help="Tesseract language(s), e.g. eng or ita+eng")
+    p_sum.add_argument("--tesseract-psm", type=int, default=6, help="Tesseract page segmentation mode")
+    p_sum.add_argument("--no-fact-check", action="store_true", help="Disable web-backed claim checks")
+    p_sum.add_argument("--fact-check-results", type=int, default=3, help="Search results per claim")
+    p_sum.add_argument("--max-claims", type=int, default=5, help="Maximum claims to review")
+
     # all
     p_all = sub.add_parser("all", help="Process all PDFs and videos in a directory")
     p_all.add_argument("input", help="Source directory")
@@ -167,7 +206,13 @@ def main() -> None:
     p_all.add_argument("--output", default="out", help="Output directory (default: out/)")
 
     args = parser.parse_args()
-    dispatch = {"pdf": cmd_pdf, "video": cmd_video, "search": cmd_search, "all": cmd_all}
+    dispatch = {
+        "pdf": cmd_pdf,
+        "video": cmd_video,
+        "search": cmd_search,
+        "summarize": cmd_summarize,
+        "all": cmd_all,
+    }
     dispatch[args.command](args)
 
 

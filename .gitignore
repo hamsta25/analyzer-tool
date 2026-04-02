@@ -10,6 +10,7 @@
 !/src/
 !/src/analyzer.py
 !/src/url_resolver.py
+!/src/summarizer.py
 !/tests/
 !/tests/**
 

@@ -30,6 +30,7 @@ Dal log condiviso:
 2. **P1**: OCR quality uplift per handwritten technical notes
 3. **P2**: Packaging, release, publication readiness
 4. **P3**: Web URL Input — video e PDF da link HTTP/HTTPS, Google Drive, piattaforme web
+5. **P4**: Intelligent Summary — sintesi con controlli spelling/logica/fact-check hints
 
 ### Milestone e Stato
 
@@ -42,6 +43,7 @@ Dal log condiviso:
 | M4 OCR Quality B | Planned | Layout-aware extraction region-based | miglior retention strutturale |
 | M5 Release Engineering | Planned | Versioning/changelog/release checklist | go/no-go report completo |
 | M6 Web URL Input | In Progress | Accetta URL HTTP/HTTPS come input per video/PDF | `analyzer.py video <gdrive-url>` trascrisce correttamente |
+| M7 Intelligent Summary | In Progress | Nuovo comando `summarize` con quality checks | report summary con controlli e test dedicati |
 
 ### Definition of Done (DoD)
 
@@ -61,6 +63,11 @@ Dal log condiviso:
   - Google Drive shared video link scaricato e trascritto correttamente.
   - Test unitari per `url_resolver.py` (mocked) e test di integrazione con URL reale.
   - `yt-dlp` aggiunto a `requirements.txt`; cleanup automatico del file temporaneo.
+- **P4 DoD**:
+  - Nuovo comando `analyzer.py summarize <input>` disponibile.
+  - Controlli pre-summary: spelling, quality/logical checks, claim extraction.
+  - Fact-check hints opzionali con fallback robusto se rete non disponibile.
+  - Test unitari + CLI regression per summarize verdi.
 
 ### KPI Operativi
 

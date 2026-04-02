@@ -11,6 +11,7 @@ A standalone, general-purpose local content analyzer. Extracts text from PDFs (d
 | `pdf_analyzer.py` | PDF files (digital or scanned/handwritten) | Markdown with extracted text, OCR where needed |
 | `video_transcriber.py` | Video/audio files (mp4, mkv, wav, …) | Markdown transcript with timestamps |
 | `web_search.py` | Search query string | Markdown with top-N DuckDuckGo results |
+| `summarizer.py` | Text/markdown/PDF/media path or URL | Quality-checked summary markdown |
 | `analyzer.py` | Any combination via unified CLI | All of the above + index |
 
 All output goes to `out/` which is gitignored — manage it per-project or per-course.
@@ -234,6 +235,12 @@ python src/analyzer.py video path/to/lecture.mkv --model small
 # Web search fallback
 python src/analyzer.py search "RISC-V pipeline hazards"
 
+# Generate quality-checked summary (spelling, logic, claim checks)
+python src/analyzer.py summarize out/lecture_transcript.md --output out/
+
+# Summarize directly from a PDF (runs OCR path if needed)
+python src/analyzer.py summarize path/to/file.pdf --ocr-engine auto --output out/
+
 # Process all PDFs + videos in a directory and generate an index
 python src/analyzer.py all path/to/course-materials/ --output out/
 ```
@@ -287,6 +294,9 @@ python src/video_transcriber.py path/to/video.mkv [--model base] [--output out/]
 
 # Web search (prints to stdout by default)
 python src/web_search.py "search query" [--n 5] [--output out/]
+
+# Summarization with quality checks
+python src/summarizer.py input-file-or-url [--output out/] [--max-sentences 8]
 ```
 
 ### OCR strategy notes (handwritten/scanned pages)
@@ -322,8 +332,11 @@ analyzer-tool/
     pdf_analyzer.py      ← PDF text extraction + OCR
     video_transcriber.py ← Whisper offline transcription
     web_search.py        ← DuckDuckGo search fallback
+    summarizer.py        ← Quality-checked summarization pipeline
     url_resolver.py      ← HTTP/HTTPS URL download (Google Drive, yt-dlp, direct)
   tests/
+    test_summarizer.py           ← unit tests for summary quality pipeline
+    test_summarize_cli.py        ← CLI regression test for summarize command
     test_url_resolver.py        ← unit tests (offline, mocked)
     test_web_url_integration.py ← integration tests (real network, opt-in)
   out/                   ← output folder (gitignored, manage per-project)
