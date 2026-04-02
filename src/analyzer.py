@@ -20,19 +20,40 @@ VIDEO_EXTENSIONS = {".mp4", ".mkv", ".avi", ".mov", ".webm", ".m4a", ".mp3", ".w
 
 def cmd_pdf(args: argparse.Namespace) -> None:
     from pdf_analyzer import process_path
-    process_path(
-        Path(args.input),
-        Path(args.output),
-        args.ocr_all,
-        ocr_engine=args.ocr_engine,
-        ocr_lang=args.ocr_lang,
-        tesseract_psm=args.tesseract_psm,
-    )
+    from url_resolver import is_url, DownloadedFile
+
+    if is_url(args.input):
+        print(f"[URL] Downloading PDF: {args.input}")
+        with DownloadedFile(args.input) as tmp_path:
+            process_path(
+                tmp_path,
+                Path(args.output),
+                args.ocr_all,
+                ocr_engine=args.ocr_engine,
+                ocr_lang=args.ocr_lang,
+                tesseract_psm=args.tesseract_psm,
+            )
+    else:
+        process_path(
+            Path(args.input),
+            Path(args.output),
+            args.ocr_all,
+            ocr_engine=args.ocr_engine,
+            ocr_lang=args.ocr_lang,
+            tesseract_psm=args.tesseract_psm,
+        )
 
 
 def cmd_video(args: argparse.Namespace) -> None:
     from video_transcriber import transcribe
-    transcribe(Path(args.input), args.model, Path(args.output))
+    from url_resolver import is_url, DownloadedFile
+
+    if is_url(args.input):
+        print(f"[URL] Downloading video: {args.input}")
+        with DownloadedFile(args.input) as tmp_path:
+            transcribe(tmp_path, args.model, Path(args.output))
+    else:
+        transcribe(Path(args.input), args.model, Path(args.output))
 
 
 def cmd_search(args: argparse.Namespace) -> None:

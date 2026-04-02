@@ -238,6 +238,43 @@ python src/analyzer.py search "RISC-V pipeline hazards"
 python src/analyzer.py all path/to/course-materials/ --output out/
 ```
 
+### Web URLs as input (Google Drive, direct links)
+
+The `video` and `pdf` subcommands accept HTTP/HTTPS URLs directly — no manual download needed.
+
+```bash
+# Transcribe a video shared on Google Drive
+python src/analyzer.py video "https://drive.google.com/file/d/1i6ZqijtHN82T9Ig5NDCN9SgHDNRctvpo/view?usp=sharing"
+
+# Transcribe a YouTube video (or any yt-dlp-supported platform)
+python src/analyzer.py video "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+
+# Download and extract text from a PDF hosted online
+python src/analyzer.py pdf "https://example.com/report.pdf"
+
+# Use a larger model when transcribing from a URL
+python src/analyzer.py video "https://drive.google.com/..." --model small --output out/
+```
+
+**Supported URL types:**
+
+| Type | Example | Backend |
+|---|---|---|
+| Google Drive shared file | `drive.google.com/file/d/.../view` | `yt-dlp` |
+| YouTube and most video platforms | `youtube.com/watch?v=...` | `yt-dlp` |
+| Direct video link | `example.com/video.mp4` | `requests` |
+| Direct PDF link | `example.com/report.pdf` | `requests` |
+
+**Requirements for URL input:**
+- `yt-dlp` is installed (included in `requirements.txt`): `pip install yt-dlp`
+- Internet access at runtime
+- For Google Drive: the file must be publicly shared ("Anyone with the link can view")
+- ffmpeg is still required for video transcription (see above)
+
+The tool downloads the file to a local temp directory, processes it, then cleans up automatically.
+
+---
+
 ### Individual modules
 
 ```bash
@@ -285,8 +322,13 @@ analyzer-tool/
     pdf_analyzer.py      ← PDF text extraction + OCR
     video_transcriber.py ← Whisper offline transcription
     web_search.py        ← DuckDuckGo search fallback
+    url_resolver.py      ← HTTP/HTTPS URL download (Google Drive, yt-dlp, direct)
+  tests/
+    test_url_resolver.py        ← unit tests (offline, mocked)
+    test_web_url_integration.py ← integration tests (real network, opt-in)
   out/                   ← output folder (gitignored, manage per-project)
   requirements.txt
+  pytest.ini
   setup.ps1              ← Windows setup
   setup.sh               ← Linux/macOS setup
 ```

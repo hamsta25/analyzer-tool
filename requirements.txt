@@ -4,3 +4,4 @@ pdf2image
 Pillow
 requests
 duckduckgo-search
+yt-dlp>=2024.1.1
