@@ -8,14 +8,19 @@ Run them explicitly:
     pytest tests/test_web_url_integration.py -v -m integration
 
 Environment requirements:
-  - pip install yt-dlp
-  - Internet access to drive.google.com
+    - pip install yt-dlp
+    - Internet access to the selected URL host
 
-FIRST ACCEPTANCE TEST:
-  Transcribe the Google Drive video shared at:
-  https://drive.google.com/file/d/1i6ZqijtHN82T9Ig5NDCN9SgHDNRctvpo/view?usp=sharing
+Default acceptance URL (short public sample):
+    https://samplelib.com/lib/preview/mp4/sample-5s.mp4
+
+You can override with:
+    ANALYZER_TEST_VIDEO_URL="https://..."
+
+Acceptance is executed against TEST_VIDEO_URL (env-overridable).
 """
 
+import os
 import sys
 from pathlib import Path
 
@@ -24,8 +29,9 @@ import pytest
 # Make src/ importable
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-GDRIVE_VIDEO_URL = (
-    "https://drive.google.com/file/d/1i6ZqijtHN82T9Ig5NDCN9SgHDNRctvpo/view?usp=sharing"
+TEST_VIDEO_URL = os.getenv(
+    "ANALYZER_TEST_VIDEO_URL",
+    "https://samplelib.com/lib/preview/mp4/sample-5s.mp4",
 )
 
 # ---------------------------------------------------------------------------
@@ -41,16 +47,16 @@ integration = pytest.mark.integration
 
 
 @integration
-def test_gdrive_download_produces_file():
+def test_web_video_download_produces_file():
     """
-    DownloadedFile must download the Google Drive video to a temp path.
+    DownloadedFile must download the selected test video URL to a temp path.
     The file must be non-empty and removed after the context exits.
     """
     from url_resolver import DownloadedFile
 
     captured_path = None
 
-    with DownloadedFile(GDRIVE_VIDEO_URL) as path:
+    with DownloadedFile(TEST_VIDEO_URL) as path:
         captured_path = path
         assert path.exists(), f"Downloaded file does not exist: {path}"
         size = path.stat().st_size
@@ -67,9 +73,9 @@ def test_gdrive_download_produces_file():
 
 
 @integration
-def test_gdrive_video_transcription_produces_markdown(tmp_path):
+def test_web_video_transcription_produces_markdown(tmp_path):
     """
-    End-to-end: download Google Drive video and transcribe with Whisper.
+    End-to-end: download test video URL and transcribe with Whisper.
     The output markdown file must exist and contain a non-empty ## Transcript section.
     """
     from url_resolver import DownloadedFile
@@ -82,7 +88,7 @@ def test_gdrive_video_transcription_produces_markdown(tmp_path):
     out_dir = tmp_path / "out"
     out_dir.mkdir()
 
-    with DownloadedFile(GDRIVE_VIDEO_URL) as video_path:
+    with DownloadedFile(TEST_VIDEO_URL) as video_path:
         transcribe(video_path, model_name="base", output_dir=out_dir)
 
     # Find the generated markdown file
@@ -109,7 +115,7 @@ def test_gdrive_video_transcription_produces_markdown(tmp_path):
 @integration
 def test_analyzer_cli_video_url(tmp_path):
     """
-    Run ``python src/analyzer.py video <gdrive_url> --output <tmp>`` as a subprocess.
+    Run ``python src/analyzer.py video <url> --output <tmp>`` as a subprocess.
     The process must exit with code 0 and produce a *_transcript.md file.
     """
     import subprocess
@@ -119,7 +125,7 @@ def test_analyzer_cli_video_url(tmp_path):
     out_dir = tmp_path / "cli_out"
 
     result = subprocess.run(
-        [sys.executable, str(analyzer), "video", GDRIVE_VIDEO_URL,
+        [sys.executable, str(analyzer), "video", TEST_VIDEO_URL,
          "--output", str(out_dir)],
         capture_output=True,
         text=True,

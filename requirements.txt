@@ -2,6 +2,6 @@ PyMuPDF>=1.24
 openai-whisper
 pdf2image
 Pillow
-requests
+requests>=2.33.0
 duckduckgo-search
 yt-dlp>=2024.1.1

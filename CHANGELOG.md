@@ -27,6 +27,8 @@ Format: [Semantic Versioning](https://semver.org/) — `MAJOR.MINOR.PATCH`.
 ### Changed
 
 - `analyzer.py` `cmd_video` and `cmd_pdf` now check `is_url()` before treating input as a filesystem path
+- `tests/test_web_url_integration.py` now uses `ANALYZER_TEST_VIDEO_URL` (default short public sample URL) to avoid hardcoding long/private links
+- `requirements.txt` now pins `requests>=2.33.0` following local `pip-audit` vulnerability findings
 
 ---
 
