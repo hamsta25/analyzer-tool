@@ -243,8 +243,8 @@ python src/analyzer.py all path/to/course-materials/ --output out/
 The `video` and `pdf` subcommands accept HTTP/HTTPS URLs directly — no manual download needed.
 
 ```bash
-# Transcribe a video shared on Google Drive
-python src/analyzer.py video "https://drive.google.com/file/d/1i6ZqijtHN82T9Ig5NDCN9SgHDNRctvpo/view?usp=sharing"
+# Transcribe a short public sample video URL
+python src/analyzer.py video "https://samplelib.com/lib/preview/mp4/sample-5s.mp4"
 
 # Transcribe a YouTube video (or any yt-dlp-supported platform)
 python src/analyzer.py video "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
