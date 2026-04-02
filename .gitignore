@@ -1,5 +1,18 @@
 # Created by venv; see https://docs.python.org/3/library/venv.html
 *
+!/.gitignore
+!/.github/
+!/.github/ROADMAP.md
+!/CHANGELOG.md
+!/README.md
+!/requirements.txt
+!/pytest.ini
+!/src/
+!/src/analyzer.py
+!/src/url_resolver.py
+!/src/summarizer.py
+!/tests/
+!/tests/**
 
 # example-usage generated assets (run generate_examples.py to create them)
 example-usage/test-image.png
@@ -7,3 +20,9 @@ example-usage/test-video.mp4
 example-usage/out/
 test
 out/*
+src/out/
+scripts/backups/
+.venv/
+.pytest_cache/
+__pycache__/
+*.pyc

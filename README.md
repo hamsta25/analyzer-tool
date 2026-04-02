@@ -11,6 +11,7 @@ A standalone, general-purpose local content analyzer. Extracts text from PDFs (d
 | `pdf_analyzer.py` | PDF files (digital or scanned/handwritten) | Markdown with extracted text, OCR where needed |
 | `video_transcriber.py` | Video/audio files (mp4, mkv, wav, …) | Markdown transcript with timestamps |
 | `web_search.py` | Search query string | Markdown with top-N DuckDuckGo results |
+| `summarizer.py` | Text/markdown/PDF/media path or URL | Quality-checked summary markdown |
 | `analyzer.py` | Any combination via unified CLI | All of the above + index |
 
 All output goes to `out/` which is gitignored — manage it per-project or per-course.
@@ -234,9 +235,52 @@ python src/analyzer.py video path/to/lecture.mkv --model small
 # Web search fallback
 python src/analyzer.py search "RISC-V pipeline hazards"
 
+# Generate quality-checked summary (spelling, logic, claim checks)
+python src/analyzer.py summarize out/lecture_transcript.md --output out/
+
+# Summarize directly from a PDF (runs OCR path if needed)
+python src/analyzer.py summarize path/to/file.pdf --ocr-engine auto --output out/
+
 # Process all PDFs + videos in a directory and generate an index
 python src/analyzer.py all path/to/course-materials/ --output out/
 ```
+
+### Web URLs as input (Google Drive, direct links)
+
+The `video` and `pdf` subcommands accept HTTP/HTTPS URLs directly — no manual download needed.
+
+```bash
+# Transcribe a short public sample video URL
+python src/analyzer.py video "https://samplelib.com/lib/preview/mp4/sample-5s.mp4"
+
+# Transcribe a YouTube video (or any yt-dlp-supported platform)
+python src/analyzer.py video "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+
+# Download and extract text from a PDF hosted online
+python src/analyzer.py pdf "https://example.com/report.pdf"
+
+# Use a larger model when transcribing from a URL
+python src/analyzer.py video "https://drive.google.com/..." --model small --output out/
+```
+
+**Supported URL types:**
+
+| Type | Example | Backend |
+|---|---|---|
+| Google Drive shared file | `drive.google.com/file/d/.../view` | `yt-dlp` |
+| YouTube and most video platforms | `youtube.com/watch?v=...` | `yt-dlp` |
+| Direct video link | `example.com/video.mp4` | `requests` |
+| Direct PDF link | `example.com/report.pdf` | `requests` |
+
+**Requirements for URL input:**
+- `yt-dlp` is installed (included in `requirements.txt`): `pip install yt-dlp`
+- Internet access at runtime
+- For Google Drive: the file must be publicly shared ("Anyone with the link can view")
+- ffmpeg is still required for video transcription (see above)
+
+The tool downloads the file to a local temp directory, processes it, then cleans up automatically.
+
+---
 
 ### Individual modules
 
@@ -250,6 +294,9 @@ python src/video_transcriber.py path/to/video.mkv [--model base] [--output out/]
 
 # Web search (prints to stdout by default)
 python src/web_search.py "search query" [--n 5] [--output out/]
+
+# Summarization with quality checks
+python src/summarizer.py input-file-or-url [--output out/] [--max-sentences 8]
 ```
 
 ### OCR strategy notes (handwritten/scanned pages)
@@ -285,8 +332,16 @@ analyzer-tool/
     pdf_analyzer.py      ← PDF text extraction + OCR
     video_transcriber.py ← Whisper offline transcription
     web_search.py        ← DuckDuckGo search fallback
+    summarizer.py        ← Quality-checked summarization pipeline
+    url_resolver.py      ← HTTP/HTTPS URL download (Google Drive, yt-dlp, direct)
+  tests/
+    test_summarizer.py           ← unit tests for summary quality pipeline
+    test_summarize_cli.py        ← CLI regression test for summarize command
+    test_url_resolver.py        ← unit tests (offline, mocked)
+    test_web_url_integration.py ← integration tests (real network, opt-in)
   out/                   ← output folder (gitignored, manage per-project)
   requirements.txt
+  pytest.ini
   setup.ps1              ← Windows setup
   setup.sh               ← Linux/macOS setup
 ```
